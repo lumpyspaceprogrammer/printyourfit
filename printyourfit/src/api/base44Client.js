@@ -40,6 +40,10 @@ const auth = {
     return supabase.auth.signUp({ email, password });
   },
 
+  async logout() {
+    return supabase.auth.signOut();
+  },
+
   async signOut() {
     return supabase.auth.signOut();
   }
