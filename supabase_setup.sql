@@ -46,3 +46,16 @@ create table if not exists pattern_versions (
   customization_options jsonb,
   label text
 );
+-- Enable RLS on your sensitive tables
+alter table projects enable row level security;
+alter table user_subscriptions enable row level security;
+alter table pattern_versions enable row level security;
+
+-- Create a policy allowing users to only see and modify their own projects
+create policy "Users can manage their own projects" 
+on projects for all 
+using (auth.uid()::text = created_by);
+
+create policy "Users can read their own subscription status" 
+on user_subscriptions for select 
+using (auth.uid()::text = created_by);
