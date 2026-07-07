@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import FloatingShapes from '../components/ui/FloatingShapes';
 import ProgressSteps from '../components/ui/ProgressSteps';
-import PatternViewer from '../components/pattern/PatternViewer';
+import SVGDrafter from '../components/pattern/SVGDrafter'; // Swap in our new vector drafting component
 import GlowButton from '../components/ui/GlowButton';
 import UpgradeModal from '../components/monetization/UpgradeModal';
 import { createPageUrl } from '@/utils';
 import { Loader2, Plus } from 'lucide-react';
+import { BodyMeasurements } from '@/types/patterns';
 
 export default function Pattern() {
-  const [project, setProject] = useState(null);
+  const [project, setProject] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function Pattern() {
   const loadProject = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const projectId = urlParams.get('projectId');
-    
+
     if (!projectId) {
       navigate(createPageUrl('Upload'));
       return;
@@ -58,7 +59,7 @@ export default function Pattern() {
     try {
       const projects = await base44.entities.Project.list();
       const foundProject = projects.find(p => p.id === projectId);
-      
+
       if (foundProject && foundProject.measurements) {
         setProject(foundProject);
       } else {
@@ -89,7 +90,7 @@ export default function Pattern() {
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-pink-200 via-purple-200 to-cyan-200">
       <FloatingShapes />
-      
+
       <div className="relative z-10 container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -110,15 +111,12 @@ export default function Pattern() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="mt-8"
+          className="mt-8 flex justify-center"
         >
           {project && (
-            <PatternViewer 
-              refinedImage={project.refined_image_url}
-              measurements={project.measurements}
-              clothingType={project.clothing_type}
-              project={project}
-            />
+            <div className="w-full max-w-4xl">
+              <SVGDrafter measurements={project.measurements as BodyMeasurements} />
+            </div>
           )}
         </motion.div>
 
@@ -132,7 +130,6 @@ export default function Pattern() {
           <GlowButton 
             variant="secondary"
             onClick={() => {
-              // Check if user has reached their limit
               if (subscription?.tier === 'free' && subscription?.has_used_free_pattern) {
                 setShowUpgradeModal(true);
               } else {
