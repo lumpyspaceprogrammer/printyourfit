@@ -40,7 +40,7 @@
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
-    "@base44/vite-plugin": "^0.0.21",
+    "@base44/vite-plugin": "^0.2.15",
     "@eslint/js": "^8.50.0",
     "@types/node": "^20.8.9",
     "@types/react": "^18.2.0",
